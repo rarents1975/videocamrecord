@@ -15,11 +15,7 @@ audiodevice="alsa_input.usb-C-Media_Electronics_Inc._USB_Audio_Device-00.analog-
 # Die IP-Adresse des Raspberrys ueber Eingabe von ifconfig auf der Linux Konsole feststellen und eintragen:
 ipaddress="192.168.0.59" 
 # Die Kirchengemeinde eintragen, zu der gestreamt werden soll
-# Gechingen = livegecho/test
-# Bondorf = live/test
-# Flein = liveflein/test
-# Irgendingen = liveirgendingen/test
-kirche="liveirgendingen/test"
+kirche="xy/test"
 #Verzeichnis, in welches die mp4-Aufnahmen geschrieben werden sollen
 mpath="/home/pi/camrk/videostreams"
 
@@ -64,7 +60,7 @@ echo "stream und lokale mp4 aufnahme werden gestartet, anzeige des kamerabildes"
 video/x-h264,profile=high ! h264parse ! tee name=t t. ! queue ! \
 flvmux name=mux pulsesrc do-timestamp=true device="$audiodevice" buffer-time=20000 ! \
 audioresample ! audio/x-raw,rate=48000 ! queue ! voaacenc bitrate=32000 ! queue ! mux. mux. ! \
-rtmpsink location=\"rtmp://rk-solutions-stream.de/$kirche live=1\" sync=false t. ! queue ! \
+rtmpsink location=\"rtmp://xy.de/$kirche live=1\" sync=false t. ! queue ! \
 flvmux name=rux pulsesrc do-timestamp=true device="$audiodevice" buffer-time=20000 ! \
 audioresample ! audio/x-raw,rate=48000 ! queue ! voaacenc bitrate=32000 ! queue ! rux. rux. ! \
 filesink location=$mpath/$(date +%Y%m%d_%H%M%S).mp4 sync=false t. ! queue ! \
