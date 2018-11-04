@@ -15,3 +15,9 @@ y=99
 y=$(ps -ef | grep 'startOMXPlayer'  | grep -v grep | awk '{print $2}')
 echo "y= "$y
 sudo kill $y
+
+# pulseaudio Prozesse beenden
+z=99
+z=$(pidof pulseaudio)
+echo $z
+sudo kill $z
