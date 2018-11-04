@@ -15,7 +15,11 @@ audiodevice="alsa_input.usb-C-Media_Electronics_Inc._USB_Audio_Device-00.analog-
 # Die IP-Adresse des Raspberrys ueber Eingabe von ifconfig auf der Linux Konsole feststellen und eintragen:
 ipaddress="192.168.0.59" 
 # Die Kirchengemeinde eintragen, zu der gestreamt werden soll
-kirche="xy/test"
+# Gechingen = livegecho/test
+# Bondorf = live/test
+# Flein = liveflein/test
+# Irgendingen = liveirgendingen/test
+kirche="liveirgendingen/test"
 #Verzeichnis, in welches die mp4-Aufnahmen geschrieben werden sollen
 mpath="/home/pi/camrk/videostreams"
 
@@ -52,6 +56,21 @@ then
   #/home/pi/camrk/startOMXPlayer.sh &
 fi
 
+# Prüfen, ob pulseaudio läuft. Wenn JA -> killen, wenn Nein nix machen
+z=$(pidof pulseaudio)
+echo "z= "$z
+zz=${z:-0}
+echo "zz= "$zz
+if [ $zz -gt 1 ]
+then
+  echo "pulseaudio laeuft"
+  echo $zz
+  sudo kill $zz
+  echo "pulseaudio nun gestoppt"
+    else
+  echo "pulseaudio laeuft nicht"
+fi
+
 # Anschliessend Videostream starten inkl. Aufnahme und Anzeige des Bildes auf dem Display
 # Ueber den Parameter "do-timestamp=true" und "buffer-time=20000" ggfs. die Verzoegerung von Ton und Bild ausgleichen 
 sleep 1
@@ -60,7 +79,7 @@ echo "stream und lokale mp4 aufnahme werden gestartet, anzeige des kamerabildes"
 video/x-h264,profile=high ! h264parse ! tee name=t t. ! queue ! \
 flvmux name=mux pulsesrc do-timestamp=true device="$audiodevice" buffer-time=20000 ! \
 audioresample ! audio/x-raw,rate=48000 ! queue ! voaacenc bitrate=32000 ! queue ! mux. mux. ! \
-rtmpsink location=\"rtmp://xy.de/$kirche live=1\" sync=false t. ! queue ! \
+rtmpsink location=\"rtmp://rk-solutions-stream.de/$kirche live=1\" sync=false t. ! queue ! \
 flvmux name=rux pulsesrc do-timestamp=true device="$audiodevice" buffer-time=20000 ! \
 audioresample ! audio/x-raw,rate=48000 ! queue ! voaacenc bitrate=32000 ! queue ! rux. rux. ! \
 filesink location=$mpath/$(date +%Y%m%d_%H%M%S).mp4 sync=false t. ! queue ! \
