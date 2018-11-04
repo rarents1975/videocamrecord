@@ -26,10 +26,31 @@ echo "f= "$f
 if [ $f -gt 0 ]
 then
 echo "gst-launch Prozess laeuft und wird jetzt gekillt"
-sudo kill $F
-exit 1
+sudo kill $f
+#exit 1
 else
 echo "gst-launch Prozess laeuft nicht"
+fi
+
+# Prüfen, ob pulseaudio laeuft. Wenn JA -> Prozess abschiessen -> wenn Nein, passiert nichts
+g=0
+y=0
+echo "y= "$y
+echo "g= "$g
+f=$(pidof pulseaudio)
+echo "g= "$g
+if [ -z "$g" ] 
+then
+g=-1
+fi
+echo "g= "$g
+if [ $g -gt 0 ]
+then
+echo "pulseaudio Prozess laeuft und wird jetzt gekillt"
+sudo kill $g
+#exit 1
+else
+echo "pulseaudio Prozess laeuft nicht"
 fi
 
 # Prüfen, ob omxplayer-Script startOMXPlayer.sh läuft. Wenn JA -> killen, wenn Nein -> mit gstreamer in die tcpsink streamen und 
@@ -47,12 +68,15 @@ if [ $x -gt 0 ]
 then
 echo "Ein omxplayer Prozess laeuft schon und wird jetzt gekillt"
 sudo kill $x
-#echo "omxplayer Prozess nun gekillt"
+echo "omxplayer Prozess nun gekillt"
 else
 echo "omxplayer laeuft nicht"
+fi
+
 #Den OMXPLAYER starten
 echo "Starte den omxplayer"
 /home/pi/camrk/startOMXPlayer.sh &
+
 echo "Starte gstreamer und streame in die tcpsink"
 #In die TCP Sync streamen was ueber den omxplayer ausgegeben werden soll
 gst-launch-1.0 v4l2src  ! "video/x-raw,width=1280,height=720,framerate=15/1" ! omxh264enc target-bitrate=1000000 control-rate=variable ! \
@@ -61,4 +85,4 @@ flvmux name=mux pulsesrc do-timestamp=true device="$audiodevice" buffer-time=200
 audioresample ! audio/x-raw,rate=48000 ! queue ! voaacenc bitrate=32000 ! queue ! mux. mux. ! \
 tcpserversink host=$ipaddress port=5000
 
-fi
+#fi
